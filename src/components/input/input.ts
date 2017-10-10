@@ -273,7 +273,6 @@ export class TextInput extends BaseInput<string> implements IonicFormInput {
     this.autocomplete = config.get('autocomplete', 'off');
     this.autocorrect = config.get('autocorrect', 'off');
     this._autoFocusAssist = config.get('autoFocusAssist', 'delay');
-    this._keyboardHeight = config.getNumber('keyboardHeight');
     this._isTextarea = !!(elementRef.nativeElement.tagName === 'ION-TEXTAREA');
 
     if (this._isTextarea && _item) {
@@ -284,17 +283,18 @@ export class TextInput extends BaseInput<string> implements IonicFormInput {
       return;
     }
 
-    const blurOnScroll = config.getBoolean('hideCaretOnScroll', false);
-    if (blurOnScroll) {
+    const hideCaretOnScroll = config.getBoolean('hideCaretOnScroll', false);
+    if (hideCaretOnScroll) {
       this._enableHideCaretOnScroll();
     }
 
     const resizeAssist = config.getBoolean('resizeAssist', false);
     if (resizeAssist) {
-      this._keyboardHeight = 60;
+      this._keyboardHeight = config.getNumber('keyboardSafeArea', 60);
       this._enableResizeAssist();
 
     } else {
+      this._keyboardHeight = config.getNumber('keyboardHeight');
       this._useAssist = config.getBoolean('scrollAssist', false);
 
       const usePadding = config.getBoolean('scrollPadding', this._useAssist);
@@ -566,7 +566,7 @@ export class TextInput extends BaseInput<string> implements IonicFormInput {
     console.debug('Input: enableAutoScroll');
     this.ionFocus.subscribe(() => {
       const scrollData = this._getScrollData();
-      if (Math.abs(scrollData.scrollAmount) > 100) {
+      if (Math.abs(scrollData.scrollAmount) > 4) {
         this._content.scrollTo(0, scrollData.scrollTo, scrollData.scrollDuration);
       }
     });
